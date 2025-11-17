@@ -25,51 +25,51 @@ public class EmployeeController {
 
     @PostMapping
     public ResponseEntity<?> createEmployee(@RequestBody EmployeeDTO employeeDto) {
-        boolean result = employeeService.save(employeeDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating employee.");
+        try {
+            employeeService.save(employeeDto);
+            return ResponseEntity.ok().body("Employee created successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Employee created successfully!");
     }
 
     @PutMapping
     public ResponseEntity<?> updateEmployee(@RequestBody EmployeeDTO employeeDto) {
-        boolean result = employeeService.update(employeeDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating employee.");
+        try {
+            employeeService.update(employeeDto);
+            return ResponseEntity.ok().body("Employee updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Employee updated successfully!");
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteEmployee(@RequestBody EmployeeDTO employeeDto) {
-        boolean result = employeeService.delete(employeeDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting employee.");
+        try {
+            employeeService.delete(employeeDto);
+            return ResponseEntity.ok().body("Employee deleted successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Employee deleted successfully!");
     }
 
     @GetMapping
     public ResponseEntity<?> getAllEmployees() {
-        List<EmployeeDTO> employees = employeeService.findAll();
-        if (employees == null || employees.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No employees found.");
+        try {
+            List<EmployeeDTO> employees = employeeService.findAll();
+            return ResponseEntity.ok().body(employees);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body(employees);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
-        EmployeeDTO employeeDTO = employeeService.findById(id);
-        if (employeeDTO != null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found with id: " + id);
+        try {
+            EmployeeDTO employeeDTO = employeeService.findById(id);
+            return ResponseEntity.ok(employeeDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
-        return ResponseEntity.ok(employeeDTO);
     }
 }

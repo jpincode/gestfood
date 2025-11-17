@@ -25,52 +25,52 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductDTO productDto) {
-        boolean result = productService.save(productDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating product.");
+        try {
+            productService.save(productDto);
+            return ResponseEntity.ok().body("Product created successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Product created successfully!");
     }
 
     @PutMapping
     public ResponseEntity<?> updateProduct(@RequestBody ProductDTO productDto) {
-        boolean result = productService.update(productDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product.");
+        try {
+            productService.update(productDto);
+            return ResponseEntity.ok().body("Product updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Product updated successfully!");
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteProduct(@RequestBody ProductDTO productDto) {
-        boolean result = productService.delete(productDto);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting product.");
+        try {
+            productService.delete(productDto);
+            return ResponseEntity.ok().body("Product deleted successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Product deleted successfully!");
     }
 
     @GetMapping
     public ResponseEntity<?> getAllProducts() {
-        List<ProductDTO> products = productService.findAll();
-        if (products == null || products.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No products found.");
+        try {
+            List<ProductDTO> products = productService.findAll();
+            return ResponseEntity.ok().body(products);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
         }
-
-        return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
-        ProductDTO productDTO = productService.findById(id);
-        if (productDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found with id: " + id);
+        try {
+            ProductDTO productDTO = productService.findById(id);
+            return ResponseEntity.ok().body(productDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        
-        return ResponseEntity.ok(productDTO);
     }
 
 }

@@ -20,44 +20,48 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public boolean save(EmployeeDTO employeeDTO) {
+    public void save(EmployeeDTO employeeDTO) {
+        try {
+            Employee employee = converterService.dtoToEmployee(employeeDTO);
+            Optional<Employee> employeeExists = employeeRepository.findById(employee.getId());
+
+            if (employee.getCpf().equals(employeeExists.get().getCpf())) {
+                throw new RuntimeException("An employee with this CPF already exists!");
+            }
+
+            if(employee.getEmail().equals(employeeExists.get().getEmail())) {
+                throw new RuntimeException("This email address is already registered!");
+            }
+            
+            employeeRepository.save(employee);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void update(EmployeeDTO employeeDTO) {
         try {
             Employee employee = converterService.dtoToEmployee(employeeDTO);
             if (employee == null) {
                 throw new RuntimeException("Converted employee is null");
             }
             employeeRepository.save(employee);
-            return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error saving employee: " + e.getMessage());
+            throw e;
         }
     }
 
     @Transactional
-    public boolean update(EmployeeDTO employeeDTO) {
-        try {
-            Employee employee = converterService.dtoToEmployee(employeeDTO);
-            if (employee == null) {
-                throw new RuntimeException("Converted employee is null");
-            }
-            employeeRepository.save(employee);
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating employee: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public boolean delete(EmployeeDTO employeeDTO) {
+    public void delete(EmployeeDTO employeeDTO) {
         try {
             Employee employee = converterService.dtoToEmployee(employeeDTO);
             if (employee == null) {
                 throw new RuntimeException("Converted employee is null");
             }
             employeeRepository.delete(employee);
-            return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting employee: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -66,13 +70,16 @@ public class EmployeeService {
             List<Employee> employees = employeeRepository.findAll();
             List<EmployeeDTO> employeesDto = new ArrayList<>();
 
+            if (employees.isEmpty()) {
+                throw new RuntimeException("There are no registered employees.");
+            }
+
             for (Employee employee : employees) {
                 employeesDto.add(converterService.employeeToDto(employee));
             }
-            
             return employeesDto;
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving employees: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -87,7 +94,7 @@ public class EmployeeService {
             }
             return converterService.employeeToDto(employee.get());
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving employee by id: " + e.getMessage());
+            throw e;
         }
     }
 }

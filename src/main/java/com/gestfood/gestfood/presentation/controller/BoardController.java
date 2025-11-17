@@ -26,51 +26,51 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<?> createBoard(@RequestBody BoardDTO boardDTO) {
-        boolean result = boardService.save(boardDTO);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating board.");
+        try {
+            boardService.save(boardDTO);
+            return ResponseEntity.ok().body("Board created sucessfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Board created sucessfully!");
     }
 
     @PutMapping
     public ResponseEntity<?> updateBoard(@RequestBody BoardDTO boardDTO) {
-        boolean result = boardService.update(boardDTO);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating board.");
+        try {
+            boardService.update(boardDTO);
+            return ResponseEntity.ok().body("Board updated sucessfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Board updated sucessfully!");
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteBoard(@RequestBody BoardDTO boardDTO) {
-        boolean result = boardService.delete(boardDTO);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting board.");
+        try {
+            boardService.delete(boardDTO);
+            return ResponseEntity.ok().body("Board deleted sucessfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("Board deleted sucessfully!");
     }
 
     @GetMapping
     public ResponseEntity<?> getAllBoards() {
-        List<BoardDTO> boards = boardService.findAll();
-        if (boards == null || boards.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No boards found.");
+        try {
+            List<BoardDTO> boardDtos = boardService.findAll();
+            return ResponseEntity.ok().body(boardDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
         }
-        
-        return ResponseEntity.ok(boardService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBoardById(@PathVariable Long id) {
-        BoardDTO boardDTO = boardService.findById(id);
-        if (boardDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Board not found with id: " + id);
-        }
-        
-        return ResponseEntity.ok(boardDTO);
+        try {
+            BoardDTO boardDTO = boardService.findById(id);
+            return ResponseEntity.ok().body(boardDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }        
     }
 }
