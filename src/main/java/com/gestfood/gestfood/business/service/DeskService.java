@@ -14,13 +14,14 @@ import com.gestfood.gestfood.model.repository.DeskRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class DeskService {
+public class DeskService implements InnerDefaultCRUD<DeskDTO> {
     @Autowired
     private DeskRepository deskRepository;
     @Autowired
     private ConverterService converterService;
 
-    public void save(DeskDTO deskDTO) {
+    @Override
+    public void create(DeskDTO deskDTO) {
         try {
             if(deskDTO.getSeats() <= 0) {
                 throw new IllegalArgumentException("Desk must have a positive number of seats.");
@@ -38,6 +39,7 @@ public class DeskService {
         }
     }
 
+    @Override
     @Transactional
     public void update(DeskDTO deskDTO) {
         try {
@@ -57,20 +59,21 @@ public class DeskService {
         }
     }
 
+    @Override
     @Transactional
-    public void delete(DeskDTO deskDTO) {
+    public void delete(Long id) {
         try {
-            Desk desk = converterService.dtoToDesk(deskDTO);
-            if (desk == null) {
-                throw new IllegalArgumentException("Could not convert desk DTO to entity");
+            if (id == null || id <= 0) {
+                throw new IllegalArgumentException("Desk ID cannot be null or less than or equal to zero");
             }
-            deskRepository.delete(desk);
+            deskRepository.deleteById(id);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public List<DeskDTO> findAll() {
+    @Override
+    public List<DeskDTO> read() {
         try {
             List<Desk> desks = deskRepository.findAll();
             List<DeskDTO> deskDTOs = new ArrayList<>();
@@ -89,7 +92,8 @@ public class DeskService {
         }
     }
 
-    public DeskDTO findById(Long id) {
+    @Override
+    public DeskDTO read(Long id) {
         try {
             if (id == null) {
                 throw new IllegalArgumentException("Desk ID cannot be null");

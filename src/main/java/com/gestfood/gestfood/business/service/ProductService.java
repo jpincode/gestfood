@@ -14,13 +14,14 @@ import com.gestfood.gestfood.model.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class ProductService {
+public class ProductService implements InnerDefaultCRUD<ProductDTO> {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
     private ConverterService converterService;
 
-    public void save(ProductDTO productDTO) {
+    @Override
+    public void create(ProductDTO productDTO) {
         try {
             Product product = converterService.dtoToProduct(productDTO);
             if (product == null) {
@@ -32,6 +33,7 @@ public class ProductService {
         }
     }
 
+    @Override
     @Transactional
     public void update(ProductDTO productDTO) {
         try {
@@ -45,20 +47,21 @@ public class ProductService {
         }
     }
 
+    @Override
     @Transactional
-    public void delete(ProductDTO productDTO) {
+    public void delete(Long id) {
         try {
-            Product product = converterService.dtoToProduct(productDTO);
-            if (product == null) {
-                throw new RuntimeException("Converted product is null");
+            if (id == null || id <= 0) {
+                throw new RuntimeException("Product ID cannot be null or less than or equal to zero");
             }
-            productRepository.delete(product);
+            productRepository.deleteById(id);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public List<ProductDTO> findAll() {
+    @Override
+    public List<ProductDTO> read() {
         try {
             List<Product> products = productRepository.findAll();
             List<ProductDTO> productDTOs = new ArrayList<>();
@@ -76,7 +79,8 @@ public class ProductService {
         }
     }
 
-    public ProductDTO findById(Long id) {
+    @Override
+    public ProductDTO read(Long id) {
         try {
             if (id == null) {
                 throw new RuntimeException("Product not found with id: " + id);

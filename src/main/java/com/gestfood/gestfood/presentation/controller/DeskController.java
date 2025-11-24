@@ -27,7 +27,7 @@ public class DeskController {
     @PostMapping
     public ResponseEntity<?> createDesk(@RequestBody DeskDTO deskDTO) {
         try {
-            deskService.save(deskDTO);
+            deskService.create(deskDTO);
             return ResponseEntity.ok().body("Desk created sucessfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -44,10 +44,10 @@ public class DeskController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteDesk(@RequestBody DeskDTO deskDTO) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDesk(@PathVariable Long id) {
         try {
-            deskService.delete(deskDTO);
+            deskService.delete(id);
             return ResponseEntity.ok().body("Desk deleted sucessfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -57,7 +57,7 @@ public class DeskController {
     @GetMapping
     public ResponseEntity<?> getAllDesks() {
         try {
-            List<DeskDTO> deskDtos = deskService.findAll();
+            List<DeskDTO> deskDtos = deskService.read();
             return ResponseEntity.ok().body(deskDtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
@@ -67,10 +67,10 @@ public class DeskController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getDeskById(@PathVariable Long id) {
         try {
-            DeskDTO deskDTO = deskService.findById(id);
+            DeskDTO deskDTO = deskService.read(id);
             return ResponseEntity.ok().body(deskDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }        
+        }
     }
 }

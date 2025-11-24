@@ -26,7 +26,7 @@ public class EmployeeController {
     @PostMapping
     public ResponseEntity<?> createEmployee(@RequestBody EmployeeDTO employeeDto) {
         try {
-            employeeService.save(employeeDto);
+            employeeService.create(employeeDto);
             return ResponseEntity.ok().body("Employee created successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -43,10 +43,10 @@ public class EmployeeController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteEmployee(@RequestBody EmployeeDTO employeeDto) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         try {
-            employeeService.delete(employeeDto);
+            employeeService.delete(id);
             return ResponseEntity.ok().body("Employee deleted successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -56,7 +56,7 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<?> getAllEmployees() {
         try {
-            List<EmployeeDTO> employees = employeeService.findAll();
+            List<EmployeeDTO> employees = employeeService.read();
             return ResponseEntity.ok().body(employees);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
@@ -66,7 +66,7 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
         try {
-            EmployeeDTO employeeDTO = employeeService.findById(id);
+            EmployeeDTO employeeDTO = employeeService.read(id);
             return ResponseEntity.ok(employeeDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

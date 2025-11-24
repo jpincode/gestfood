@@ -26,7 +26,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductDTO productDto) {
         try {
-            productService.save(productDto);
+            productService.create(productDto);
             return ResponseEntity.ok().body("Product created successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -43,10 +43,10 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteProduct(@RequestBody ProductDTO productDto) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
-            productService.delete(productDto);
+            productService.delete(id);
             return ResponseEntity.ok().body("Product deleted successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -56,7 +56,7 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<?> getAllProducts() {
         try {
-            List<ProductDTO> products = productService.findAll();
+            List<ProductDTO> products = productService.read();
             return ResponseEntity.ok().body(products);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
@@ -66,7 +66,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
         try {
-            ProductDTO productDTO = productService.findById(id);
+            ProductDTO productDTO = productService.read(id);
             return ResponseEntity.ok().body(productDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

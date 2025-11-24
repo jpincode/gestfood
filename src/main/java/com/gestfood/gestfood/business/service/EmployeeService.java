@@ -14,13 +14,14 @@ import com.gestfood.gestfood.model.repository.EmployeeRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class EmployeeService {
+public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
     @Autowired
     private ConverterService converterService;
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public void save(EmployeeDTO employeeDTO) {
+    @Override
+    public void create(EmployeeDTO employeeDTO) {
         try {
             Employee employee = converterService.dtoToEmployee(employeeDTO);
             Optional<Employee> employeeExists = employeeRepository.findById(employee.getId());
@@ -39,6 +40,7 @@ public class EmployeeService {
         }
     }
 
+    @Override
     @Transactional
     public void update(EmployeeDTO employeeDTO) {
         try {
@@ -52,20 +54,21 @@ public class EmployeeService {
         }
     }
 
+    @Override
     @Transactional
-    public void delete(EmployeeDTO employeeDTO) {
+    public void delete(Long id) {
         try {
-            Employee employee = converterService.dtoToEmployee(employeeDTO);
-            if (employee == null) {
-                throw new RuntimeException("Converted employee is null");
+            if (id == null || id <= 0) {
+                throw new RuntimeException("Employee ID cannot be null or less than or equal to zero");
             }
-            employeeRepository.delete(employee);
+            employeeRepository.deleteById(id);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public List<EmployeeDTO> findAll() {
+    @Override
+    public List<EmployeeDTO> read() {
         try {
             List<Employee> employees = employeeRepository.findAll();
             List<EmployeeDTO> employeesDto = new ArrayList<>();
@@ -82,8 +85,9 @@ public class EmployeeService {
             throw e;
         }
     }
-
-    public EmployeeDTO findById(Long id) {
+    
+    @Override
+    public EmployeeDTO read(Long id) {
         try {
             if (id == null) {
                 throw new RuntimeException("Employee not found with id: " + id);

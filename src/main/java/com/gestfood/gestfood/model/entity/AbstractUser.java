@@ -1,5 +1,6 @@
 package com.gestfood.gestfood.model.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +22,10 @@ public abstract class AbstractUser {
 
     private String password;
     private String name;
+
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private Long cpf;
 }
