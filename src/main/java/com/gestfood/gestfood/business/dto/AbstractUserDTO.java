@@ -1,22 +1,18 @@
 package com.gestfood.gestfood.business.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class AbstractUserDTO {
     private Long id;
     private String name;
     private String email;
     private String password;
     private Long cpf;
-
-    public AbstractUserDTO(Long id, String name, String email, String password, Long cpf) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.cpf = cpf;
-    }
 }
