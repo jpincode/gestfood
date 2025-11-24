@@ -1,22 +1,22 @@
-package com.gestfood.gestfood.business.services;
+package com.gestfood.gestfood.business.service;
 
 import org.springframework.stereotype.Service;
 
-import com.gestfood.gestfood.business.dtos.BoardDTO;
-import com.gestfood.gestfood.business.dtos.EmployeeDTO;
-import com.gestfood.gestfood.business.dtos.ProductDTO;
-import com.gestfood.gestfood.models.entities.Board;
-import com.gestfood.gestfood.models.entities.Employee;
-import com.gestfood.gestfood.models.entities.Product;
+import com.gestfood.gestfood.business.dto.DeskDTO;
+import com.gestfood.gestfood.business.dto.EmployeeDTO;
+import com.gestfood.gestfood.business.dto.ProductDTO;
+import com.gestfood.gestfood.model.entity.Desk;
+import com.gestfood.gestfood.model.entity.Employee;
+import com.gestfood.gestfood.model.entity.Product;
 
 @Service
 public class ConverterService {
-    public BoardDTO boardToDto(Board board) {
-        return new BoardDTO(board.getId(), board.getSeats());
+    public DeskDTO deskToDto(Desk desk) {
+        return new DeskDTO(desk.getId(), desk.getSeats());
     }
 
-    public Board dtoToBoard(BoardDTO boardDTO) {
-        return new Board(boardDTO.getId(), boardDTO.getSeats());
+    public Desk dtoToDesk(DeskDTO deskDTO) {
+        return new Desk(deskDTO.getId(), deskDTO.getSeats());
     }
 
     public Product dtoToProduct(ProductDTO productDTO) {

@@ -1,16 +1,16 @@
-package com.gestfood.gestfood.business.dtos;
+package com.gestfood.gestfood.business.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class BoardDTO {
+public class DeskDTO {
     private Long id;
     
     private int seats;
 
-    public BoardDTO(Long id, int seats) {
+    public DeskDTO(Long id, int seats) {
         this.id = id;
         this.seats = seats;
     } 

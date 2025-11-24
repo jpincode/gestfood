@@ -1,4 +1,4 @@
-package com.gestfood.gestfood.business.dtos;
+package com.gestfood.gestfood.business.dto;
 
 import java.math.BigDecimal;
 

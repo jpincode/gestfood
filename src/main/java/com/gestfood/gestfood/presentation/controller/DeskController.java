@@ -14,61 +14,61 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestfood.gestfood.business.dtos.BoardDTO;
-import com.gestfood.gestfood.business.services.BoardService;
+import com.gestfood.gestfood.business.dto.DeskDTO;
+import com.gestfood.gestfood.business.service.DeskService;
 
 
 @RestController
-@RequestMapping("/api/boards")
-public class BoardController {
+@RequestMapping("/api/desks")
+public class DeskController {
     @Autowired
-    private BoardService boardService;
+    private DeskService deskService;
 
     @PostMapping
-    public ResponseEntity<?> createBoard(@RequestBody BoardDTO boardDTO) {
+    public ResponseEntity<?> createDesk(@RequestBody DeskDTO deskDTO) {
         try {
-            boardService.save(boardDTO);
-            return ResponseEntity.ok().body("Board created sucessfully!");
+            deskService.save(deskDTO);
+            return ResponseEntity.ok().body("Desk created sucessfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @PutMapping
-    public ResponseEntity<?> updateBoard(@RequestBody BoardDTO boardDTO) {
+    public ResponseEntity<?> updateDesk(@RequestBody DeskDTO deskDTO) {
         try {
-            boardService.update(boardDTO);
-            return ResponseEntity.ok().body("Board updated sucessfully!");
+            deskService.update(deskDTO);
+            return ResponseEntity.ok().body("Desk updated sucessfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteBoard(@RequestBody BoardDTO boardDTO) {
+    public ResponseEntity<?> deleteDesk(@RequestBody DeskDTO deskDTO) {
         try {
-            boardService.delete(boardDTO);
-            return ResponseEntity.ok().body("Board deleted sucessfully!");
+            deskService.delete(deskDTO);
+            return ResponseEntity.ok().body("Desk deleted sucessfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllBoards() {
+    public ResponseEntity<?> getAllDesks() {
         try {
-            List<BoardDTO> boardDtos = boardService.findAll();
-            return ResponseEntity.ok().body(boardDtos);
+            List<DeskDTO> deskDtos = deskService.findAll();
+            return ResponseEntity.ok().body(deskDtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBoardById(@PathVariable Long id) {
+    public ResponseEntity<?> getDeskById(@PathVariable Long id) {
         try {
-            BoardDTO boardDTO = boardService.findById(id);
-            return ResponseEntity.ok().body(boardDTO);
+            DeskDTO deskDTO = deskService.findById(id);
+            return ResponseEntity.ok().body(deskDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }        

@@ -1,4 +1,4 @@
-package com.gestfood.gestfood.business.services;
+package com.gestfood.gestfood.business.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestfood.gestfood.business.dtos.EmployeeDTO;
-import com.gestfood.gestfood.models.entities.Employee;
-import com.gestfood.gestfood.models.repositories.EmployeeRepository;
+import com.gestfood.gestfood.business.dto.EmployeeDTO;
+import com.gestfood.gestfood.model.entity.Employee;
+import com.gestfood.gestfood.model.repository.EmployeeRepository;
 
 import jakarta.transaction.Transactional;
 

@@ -1,4 +1,4 @@
-package com.gestfood.gestfood.models.entities;
+package com.gestfood.gestfood.model.entity;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;

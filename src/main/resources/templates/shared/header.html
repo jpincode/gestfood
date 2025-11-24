@@ -1,0 +1,43 @@
+<link rel="stylesheet" th:href="@{/css/header.css}">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<header th:fragment="header_fragment">
+    <div class="header-container">
+        <div class="header-content">
+            <!-- Logo e Título -->
+            <div class="header-brand">
+                <a th:href="@{/}" class="logo">
+                    <i class="fas fa-utensils"></i>
+                    Gest<span>Food</span>
+                </a>
+                <p class="subtitle">Sistema de Gerenciamento de Pedidos</p>
+            </div>
+
+            <!-- Navegação -->
+            <nav class="header-nav">
+                <a th:href="@{/error404}" class="nav-link active">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+                <a th:href="@{/error404}" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    Pedidos
+                </a>
+                <a th:href="@{/error404}" class="nav-link">
+                    <i class="fas fa-chair"></i>
+                    Mesas
+                </a>
+                <a th:href="@{/error404}" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    Cardápio
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Elementos Decorativos -->
+    <div class="header-elements">
+        <div class="header-element"></div>
+        <div class="header-element"></div>
+        <div class="header-element"></div>
+    </div>
+</header>

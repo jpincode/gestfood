@@ -1,4 +1,4 @@
-package com.gestfood.gestfood.models.entities;
+package com.gestfood.gestfood.model.entity;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "board")
-public class Board {
+public class Desk {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +21,10 @@ public class Board {
     @Nonnull
     private int seats;
 
-    public Board() {
+    public Desk() {
     }
 
-    public Board(Long id, int seats) {
+    public Desk(Long id, int seats) {
         this.id = id;
         this.seats = seats;
     }

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestfood.gestfood.business.dtos.EmployeeDTO;
-import com.gestfood.gestfood.business.services.EmployeeService;
+import com.gestfood.gestfood.business.dto.EmployeeDTO;
+import com.gestfood.gestfood.business.service.EmployeeService;
 
 @RestController
 @RequestMapping("/api/employees")
