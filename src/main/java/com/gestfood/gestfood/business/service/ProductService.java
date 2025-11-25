@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestfood.gestfood.business.dto.ProductDTO;
+import com.gestfood.gestfood.business.exception.InternalServerErrorException;
+import com.gestfood.gestfood.business.exception.NoContentException;
+import com.gestfood.gestfood.business.exception.ResourceConflictException;
+import com.gestfood.gestfood.business.exception.ResourceNotFoundException;
 import com.gestfood.gestfood.model.entity.Product;
 import com.gestfood.gestfood.model.repository.ProductRepository;
 
@@ -24,8 +28,9 @@ public class ProductService implements InnerDefaultCRUD<ProductDTO> {
     public void create(ProductDTO productDTO) {
         try {
             Product product = converterService.dtoToProduct(productDTO);
-            if (product == null) {
-                throw new RuntimeException("Converted product is null");
+            Optional<Product> productExists = productRepository.findById(product.getId());
+            if (productExists.isPresent()) {
+                throw new ResourceConflictException("produto", product.getId());
             }
             productRepository.save(product);
         } catch (Exception e) {
@@ -38,8 +43,9 @@ public class ProductService implements InnerDefaultCRUD<ProductDTO> {
     public void update(ProductDTO productDTO) {
         try {
             Product product = converterService.dtoToProduct(productDTO);
-            if (product == null) {
-                throw new RuntimeException("Converted product is null");
+            Optional<Product> productExists = productRepository.findById(product.getId());
+            if (productExists.isEmpty()) {
+                throw new ResourceNotFoundException("produto", product.getId());
             }
             productRepository.save(product);
         } catch (Exception e) {
@@ -52,7 +58,7 @@ public class ProductService implements InnerDefaultCRUD<ProductDTO> {
     public void delete(Long id) {
         try {
             if (id == null || id <= 0) {
-                throw new RuntimeException("Product ID cannot be null or less than or equal to zero");
+                throw new InternalServerErrorException("O ID do produto não pode ser nulo nem menor ou igual a zero.");
             }
             productRepository.deleteById(id);
         } catch (Exception e) {
@@ -67,7 +73,7 @@ public class ProductService implements InnerDefaultCRUD<ProductDTO> {
             List<ProductDTO> productDTOs = new ArrayList<>();
 
             if(products.isEmpty()) {
-                throw new RuntimeException("There are no products listed.");
+                throw new NoContentException("produto");
             }
             
             for (Product product : products) {
@@ -83,11 +89,11 @@ public class ProductService implements InnerDefaultCRUD<ProductDTO> {
     public ProductDTO read(Long id) {
         try {
             if (id == null) {
-                throw new RuntimeException("Product not found with id: " + id);
+                throw new ResourceNotFoundException("produto", id);
             }
             Optional<Product> product = productRepository.findById(id);
             if (product.isEmpty()) {
-                throw new RuntimeException("Product not found with id: " + id);
+                throw new ResourceNotFoundException("produto", id);
             }
             return converterService.productToDto(product.get());
         } catch (Exception e) {

@@ -5,6 +5,10 @@ public class ResourceConflictException extends BusinessException {
         super(String.format("Já existente: %s com ID %d", resource, id));
     }
 
+    public ResourceConflictException(String resource, String value) {
+        super(String.format("Já existente: %s com valor '%s'", resource, value));
+    }
+
     public ResourceConflictException(String message, Throwable cause) {
         super(message, cause);
     }

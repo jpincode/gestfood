@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestfood.gestfood.business.dto.OrderDTO;
+import com.gestfood.gestfood.business.exception.NoContentException;
+import com.gestfood.gestfood.business.exception.ResourceConflictException;
 import com.gestfood.gestfood.business.exception.ResourceNotFoundException;
 import com.gestfood.gestfood.model.entity.Order;
 import com.gestfood.gestfood.model.repository.OrderRepository;
@@ -23,9 +25,12 @@ public class OrderService implements InnerDefaultCRUD<OrderDTO> {
     public void create(OrderDTO dto) {
         try {
             Order order = converterService.dtoToOrder(dto);
-            if (order == null) {
-                throw new RuntimeException("Converted order is null");
+            Optional<Order> orderExists = orderRepository.findById(order.getId());
+            
+            if (orderExists.isPresent()) {
+                throw new ResourceConflictException("Pedido", order.getId());
             }
+
             orderRepository.save(order);
         } catch (Exception e) {
             throw e;
@@ -36,17 +41,15 @@ public class OrderService implements InnerDefaultCRUD<OrderDTO> {
     public void update(OrderDTO dto) {
         try {
             Optional<Order> optionalOrder = orderRepository.findById(dto.getId());
-            if (optionalOrder.isPresent()) {
-                Order orderToUpdate = optionalOrder.get();
-                Order updatedOrder = converterService.dtoToOrder(dto);
-                if (updatedOrder == null) {
-                    throw new RuntimeException("Converted order is null");
-                }
-                updatedOrder.setId(orderToUpdate.getId());
-                orderRepository.save(updatedOrder);
-            } else {
-                throw new RuntimeException("Order not found with id: " + dto.getId());
+            if (!optionalOrder.isPresent()) {
+                throw new ResourceNotFoundException("Pedido", dto.getId());
             }
+            
+            Order orderToUpdate = optionalOrder.get();
+            Order updatedOrder = converterService.dtoToOrder(dto);
+            
+            updatedOrder.setId(orderToUpdate.getId());
+            orderRepository.save(updatedOrder);
         } catch (Exception e) {
             throw e;
         }
@@ -59,7 +62,7 @@ public class OrderService implements InnerDefaultCRUD<OrderDTO> {
             if (order.isPresent()) {
                 orderRepository.deleteById(id);
             } else {
-                throw new RuntimeException("Order not found with id: " + id);
+                throw new ResourceNotFoundException("Pedido", id);
             }
         } catch (Exception e) {
             throw e;
@@ -73,7 +76,7 @@ public class OrderService implements InnerDefaultCRUD<OrderDTO> {
             List<OrderDTO> orderDTOs = new ArrayList<>();
 
             if (orders == null) {
-                throw new RuntimeException("Orders list is null");
+                throw new NoContentException("pedido");
             }
             
             for (Order order : orders) {

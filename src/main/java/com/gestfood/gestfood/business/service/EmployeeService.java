@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestfood.gestfood.business.dto.EmployeeDTO;
+import com.gestfood.gestfood.business.exception.InternalServerErrorException;
+import com.gestfood.gestfood.business.exception.NoContentException;
+import com.gestfood.gestfood.business.exception.ResourceConflictException;
+import com.gestfood.gestfood.business.exception.ResourceNotFoundException;
 import com.gestfood.gestfood.model.entity.Employee;
 import com.gestfood.gestfood.model.repository.EmployeeRepository;
 
@@ -27,11 +31,11 @@ public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
             Optional<Employee> employeeExists = employeeRepository.findById(employee.getId());
 
             if (employee.getCpf().equals(employeeExists.get().getCpf())) {
-                throw new RuntimeException("An employee with this CPF already exists!");
+                throw new ResourceConflictException("CPF", employee.getCpf());
             }
 
             if(employee.getEmail().equals(employeeExists.get().getEmail())) {
-                throw new RuntimeException("This email address is already registered!");
+                throw new ResourceConflictException("Email", employee.getEmail());
             }
             
             employeeRepository.save(employee);
@@ -45,9 +49,11 @@ public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
     public void update(EmployeeDTO employeeDTO) {
         try {
             Employee employee = converterService.dtoToEmployee(employeeDTO);
-            if (employee == null) {
-                throw new RuntimeException("Converted employee is null");
+            Optional<Employee> existingEmployee = employeeRepository.findById(employee.getId());
+            if (existingEmployee.isEmpty()) {
+                throw new ResourceNotFoundException("Funcionário", employee.getId());
             }
+            employee.setId(existingEmployee.get().getId());
             employeeRepository.save(employee);
         } catch (Exception e) {
             throw e;
@@ -59,7 +65,7 @@ public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
     public void delete(Long id) {
         try {
             if (id == null || id <= 0) {
-                throw new RuntimeException("Employee ID cannot be null or less than or equal to zero");
+                throw new InternalServerErrorException("O ID do funcionário não pode ser nulo nem menor ou igual a zero.");
             }
             employeeRepository.deleteById(id);
         } catch (Exception e) {
@@ -74,7 +80,7 @@ public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
             List<EmployeeDTO> employeesDto = new ArrayList<>();
 
             if (employees.isEmpty()) {
-                throw new RuntimeException("There are no registered employees.");
+                throw new NoContentException("funcionário");
             }
 
             for (Employee employee : employees) {
@@ -90,11 +96,11 @@ public class EmployeeService implements InnerDefaultCRUD<EmployeeDTO> {
     public EmployeeDTO read(Long id) {
         try {
             if (id == null) {
-                throw new RuntimeException("Employee not found with id: " + id);
+                throw new ResourceNotFoundException("Funcionário", id);
             }
             Optional<Employee> employee = employeeRepository.findById(id);
             if (employee.isEmpty()) {
-                throw new RuntimeException("Employee not found with id: " + id);
+                throw new ResourceNotFoundException("Funcionário", id);
             }
             return converterService.employeeToDto(employee.get());
         } catch (Exception e) {
