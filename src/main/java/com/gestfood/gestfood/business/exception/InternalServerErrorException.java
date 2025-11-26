@@ -1,12 +1,11 @@
 package com.gestfood.gestfood.business.exception;
 
 public class InternalServerErrorException extends BusinessException {
+    public InternalServerErrorException() {
+        super("Ocorreu um erro interno no servidor");
+    }
+
     public InternalServerErrorException(String message) {
-        super("Ocorreu um erro interno no servidor: " + message);
+        super(message);
     }
-
-    public InternalServerErrorException(String message, Throwable cause) {
-        super("Ocorreu um erro interno no servidor: " + message, cause);
-    }
-
 }

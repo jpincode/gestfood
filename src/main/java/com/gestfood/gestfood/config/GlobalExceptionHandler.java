@@ -2,69 +2,52 @@ package com.gestfood.gestfood.config;
 
 import java.time.LocalDateTime;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.gestfood.gestfood.business.exception.EntityConflictException;
+import com.gestfood.gestfood.business.exception.EntityNotFoundException;
 import com.gestfood.gestfood.business.exception.ErrorResponse;
 import com.gestfood.gestfood.business.exception.InternalServerErrorException;
-import com.gestfood.gestfood.business.exception.ResourceConflictException;
-import com.gestfood.gestfood.business.exception.ResourceNotFoundException;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // Error 404 - Not Found
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlerResponseNotFound(Exception e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            e.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatusCode(HttpStatus.NOT_FOUND.value());
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.getReasonPhrase());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     // Error 409 - Conflict
-    @ExceptionHandler(ResourceConflictException.class)
-    public ResponseEntity<ErrorResponse> handlerResourceConflict(Exception e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.CONFLICT.value(),
-            e.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+    @ExceptionHandler(EntityConflictException.class)
+    public ResponseEntity<ErrorResponse> handleEntityConflictException(EntityConflictException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
+        errorResponse.setStatus(HttpStatus.CONFLICT.getReasonPhrase());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     // Error 500 - Internal Server Error
     @ExceptionHandler(InternalServerErrorException.class)
-    public ResponseEntity<ErrorResponse> handlerInternalServerError(Exception e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            e.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+    public ResponseEntity<ErrorResponse> handleInternalServerErrorException(InternalServerErrorException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    // Error 400 - Bad Request
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handlerBadRequest(Exception e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            e.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
