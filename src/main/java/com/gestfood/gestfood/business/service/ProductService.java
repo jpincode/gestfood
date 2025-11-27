@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestfood.gestfood.business.dto.ProductDTO;
+import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
+import com.gestfood.gestfood.business.dto.product.ProductResponseDTO;
+import com.gestfood.gestfood.business.dto.product.ProductUpdateDTO;
 import com.gestfood.gestfood.business.exception.EntityConflictException;
 import com.gestfood.gestfood.business.exception.EntityNotFoundException;
 import com.gestfood.gestfood.business.exception.InternalServerErrorException;
@@ -17,7 +19,7 @@ import com.gestfood.gestfood.model.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class ProductService implements InnerDefaultCrud<ProductDTO> {
+public class ProductService implements InnerDefaultCrud<ProductRequestDTO, ProductResponseDTO, ProductUpdateDTO> {
     @Autowired
     private ProductRepository productRepository;
     @Autowired

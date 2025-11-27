@@ -1,5 +1,7 @@
 package com.gestfood.gestfood.model.entity;
 
+import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,4 +26,10 @@ public class Product {
     private String name;
     private Double price;
     private String description;
+
+    public Product(ProductRequestDTO productRequestDTO) {
+        this.name = productRequestDTO.name();
+        this.price = productRequestDTO.price();
+        this.description = productRequestDTO.description();
+    }
 }

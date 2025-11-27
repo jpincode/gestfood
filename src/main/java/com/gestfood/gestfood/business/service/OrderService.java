@@ -28,7 +28,7 @@ public class OrderService implements InnerDefaultCrud<OrderDTO> {
         if (orderExists.isPresent()) {
             throw new EntityConflictException("Já existe um pedido com o ID: " + order.getId());
         }
-
+        order.calculateTotalAmount();
         orderRepository.save(order);
     }
 

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestfood.gestfood.business.dto.DeskDTO;
+import com.gestfood.gestfood.business.dto.desk.DeskReponseDTO;
+import com.gestfood.gestfood.business.dto.desk.DeskRequestDTO;
+import com.gestfood.gestfood.business.dto.desk.DeskUpdateDTO;
 import com.gestfood.gestfood.business.service.DeskService;
 
 
@@ -25,7 +27,7 @@ public class DeskController {
     private DeskService deskService;
 
     @PostMapping
-    public ResponseEntity<?> createDesk(@RequestBody DeskDTO deskDTO) {
+    public ResponseEntity<?> createDesk(@RequestBody DeskRequestDTO deskDTO) {
         try {
             deskService.create(deskDTO);
             return ResponseEntity.ok().body("Desk created sucessfully!");
@@ -35,7 +37,7 @@ public class DeskController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateDesk(@RequestBody DeskDTO deskDTO) {
+    public ResponseEntity<?> updateDesk(@RequestBody DeskUpdateDTO deskDTO) {
         try {
             deskService.update(deskDTO);
             return ResponseEntity.ok().body("Desk updated sucessfully!");
@@ -57,7 +59,7 @@ public class DeskController {
     @GetMapping
     public ResponseEntity<?> getAllDesks() {
         try {
-            List<DeskDTO> deskDtos = deskService.read();
+            List<DeskReponseDTO> deskDtos = deskService.read();
             return ResponseEntity.ok().body(deskDtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
@@ -67,7 +69,7 @@ public class DeskController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getDeskById(@PathVariable Long id) {
         try {
-            DeskDTO deskDTO = deskService.read(id);
+            DeskReponseDTO deskDTO = deskService.read(id);
             return ResponseEntity.ok().body(deskDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

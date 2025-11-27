@@ -2,10 +2,10 @@ package com.gestfood.gestfood.business.service;
 
 import java.util.List;
 
-public interface InnerDefaultCrud<Entity> {
-    void create(Entity entity);
-    List<Entity> read();
-    Entity read(Long id);
-    void update(Entity entity);
+public interface InnerDefaultCrud<RequestEntity, ResponseEntity, UpdateEntity> {
+    void create(RequestEntity requestEntity);
+    List<ResponseEntity> read();
+    ResponseEntity read(Long id);
+    void update(UpdateEntity updateEntity);
     void delete(Long id);
 }

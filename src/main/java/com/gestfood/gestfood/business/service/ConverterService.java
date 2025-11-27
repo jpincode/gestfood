@@ -3,7 +3,7 @@ package com.gestfood.gestfood.business.service;
 import org.springframework.stereotype.Service;
 
 import com.gestfood.gestfood.business.dto.ClientDTO;
-import com.gestfood.gestfood.business.dto.DeskDTO;
+import com.gestfood.gestfood.business.dto.CreateDeskDTO;
 import com.gestfood.gestfood.business.dto.EmployeeDTO;
 import com.gestfood.gestfood.business.dto.OrderDTO;
 import com.gestfood.gestfood.business.dto.ProductDTO;
@@ -15,8 +15,8 @@ import com.gestfood.gestfood.model.entity.Product;
 
 @Service
 public class ConverterService {
-    public DeskDTO deskToDto(Desk desk) {
-        DeskDTO dto = new DeskDTO();
+    public CreateDeskDTO deskToDto(Desk desk) {
+        CreateDeskDTO dto = new CreateDeskDTO();
         if(desk.getId() != null) {
             dto.setId(desk.getId());
         }
@@ -26,7 +26,7 @@ public class ConverterService {
         return dto;
     }
 
-    public Desk dtoToDesk(DeskDTO deskDTO) {
+    public Desk dtoToDesk(CreateDeskDTO deskDTO) {
         Desk desk = new Desk();
         if(deskDTO.getId() != null) {
             desk.setId(deskDTO.getId());
