@@ -25,14 +25,14 @@ public class DeskController {
     private DeskService deskService;
 
     @PostMapping
-    public ResponseEntity<String> createDesk(@RequestBody DeskRequestDTO deskDTO) {
-        deskService.create(deskDTO);
+    public ResponseEntity<String> createDesk(@RequestBody DeskRequestDTO dto) {
+        deskService.create(dto);
         return ResponseEntity.ok().body("Mesa cadastrada com sucesso!");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateDesk(@PathVariable Long id, @RequestBody DeskUpdateDTO deskDTO) {
-        deskService.update(id, deskDTO);
+    public ResponseEntity<String> updateDesk(@PathVariable Long id, @RequestBody DeskUpdateDTO dto) {
+        deskService.update(id, dto);
         return ResponseEntity.ok().body("Mesa atualizada com sucesso!");
     }
 

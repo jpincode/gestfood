@@ -22,21 +22,21 @@ public class DeskService {
     @Autowired
     private ValidationService validationService;
 
-    public void create(DeskRequestDTO deskRequestDTO) {
-        validateSeats(deskRequestDTO.seats());
+    public void create(DeskRequestDTO dto) {
+        validateSeats(dto.seats());
         
-        Desk desk = new Desk(deskRequestDTO);
+        Desk desk = new Desk(dto);
         deskRepository.save(desk);
     }
 
     @Transactional
-    public void update(Long id, DeskUpdateDTO deskUpdateDTO) {
-        validateSeats(deskUpdateDTO.seats());
+    public void update(Long id, DeskUpdateDTO dto) {
+        validateSeats(dto.seats());
         validationService.validateId(id);
 
         Desk desk = deskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("A mesa não foi encontrada."));
-        desk.setSeats(deskUpdateDTO.seats());
+        desk.setSeats(dto.seats());
     }
 
     @Transactional

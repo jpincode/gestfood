@@ -27,20 +27,20 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<String> createProduct(
-            @RequestPart("product") ProductRequestDTO productDto,
+            @RequestPart("product") ProductRequestDTO dto,
             @RequestPart("files") List<MultipartFile> images) {
 
-        productService.create(productDto, images);
+        productService.create(dto, images);
         return ResponseEntity.ok().body("Produto cadastrado com sucesso!");
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProduct(
             @PathVariable Long id,
-            @RequestPart("product") ProductUpdateDTO productDto,
+            @RequestPart("product") ProductUpdateDTO dto,
             @RequestPart("files") List<MultipartFile> images) {
 
-        productService.update(id, productDto, images);
+        productService.update(id, dto, images);
         return ResponseEntity.ok().body("Produto atualizado com sucesso!");
     }
 

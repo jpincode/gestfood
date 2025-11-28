@@ -25,14 +25,14 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<String> createOrder(@RequestBody OrderRequestDTO orderDTO) {
-        orderService.create(orderDTO);
+    public ResponseEntity<String> createOrder(@RequestBody OrderRequestDTO dto) {
+        orderService.create(dto);
         return ResponseEntity.ok().body("Pedido cadastrado com sucesso!");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateOrder(@PathVariable Long id, @RequestBody OrderUpdateDTO orderDTO) {
-        orderService.update(id, orderDTO);
+    public ResponseEntity<String> updateOrder(@PathVariable Long id, @RequestBody OrderUpdateDTO dto) {
+        orderService.update(id, dto);
         return ResponseEntity.ok().body("Pedido atualizado com sucesso!");
     }
 

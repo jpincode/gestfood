@@ -25,14 +25,14 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequestDTO employeeDto) {
-        employeeService.create(employeeDto);
+    public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequestDTO dto) {
+        employeeService.create(dto);
         return ResponseEntity.ok().body("Funcionário cadastrado com sucesso!");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Long id, @RequestBody EmployeeUpdateDTO employeeDto) {
-        employeeService.update(id, employeeDto);
+    public ResponseEntity<String> updateEmployee(@PathVariable Long id, @RequestBody EmployeeUpdateDTO dto) {
+        employeeService.update(id, dto);
         return ResponseEntity.ok().body("Funcionário atualizado com sucesso!");
     }
 
