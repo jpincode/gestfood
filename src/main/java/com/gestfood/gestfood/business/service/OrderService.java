@@ -32,15 +32,16 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
     public void create(OrderRequestDTO dto) {
         Order order = new Order(dto);
 
-        BigDecimal total = dto.productIds().stream()
-                .map(id -> productRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Produto com ID: " + id + " não encontrado.")))
+        BigDecimal total = dto.products().stream()
+                .map(Product::getId)
+                .map(idFind -> productRepository.findById(idFind)
+                        .orElseThrow(() -> new EntityNotFoundException("Produto com ID: " + idFind + " não encontrado.")))
                 .map(Product::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotalAmount(total);
-        order.setClientId(dto.clientId());
-        order.setProductIds(new ArrayList<>(dto.productIds()));
+        order.setClient(dto.client());
+        order.setProducts(new ArrayList<>(dto.products()));
 
         validateEntity(order);
 
@@ -53,18 +54,18 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
 
-        BigDecimal recalculatedTotal = dto.productIds().stream()
+        BigDecimal recalculatedTotal = dto.products().stream()
+                .map(Product::getId)
                 .map(idFind -> productRepository.findById(idFind)
-                        .orElseThrow(
-                                () -> new EntityNotFoundException("Produto com ID: " + idFind + " não encontrado.")))
+                        .orElseThrow(() -> new EntityNotFoundException("Produto com ID: " + idFind + " não encontrado.")))
                 .map(Product::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setDescription(dto.description());
         order.setStatus(dto.status());
         order.setTotalAmount(recalculatedTotal);
-        order.setClientId(dto.clientId());
-        order.setProductIds(new ArrayList<>(dto.productIds()));
+        order.setClient(dto.client());
+        order.setProducts(new ArrayList<>(dto.products()));
 
         validateEntity(order);
     }
@@ -103,7 +104,7 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
         if(entity.getStatus() == null || entity.getStatus().isBlank()) {
             throw new BadRequestException("O status do pedido não pode ser nulo/vazio.");
         }
-        if(entity.getClientId() == null || entity.getClientId() <= 0) {
+        if(entity.getClient() == null || entity.getClient().getId() <= 0) {
             throw new BadRequestException("O ID do cliente não pode ser nulo/menor ou igual a zero.");
         }
     }

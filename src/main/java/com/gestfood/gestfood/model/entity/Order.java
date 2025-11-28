@@ -37,7 +37,7 @@ public class Order {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
-    private Long clientId;
+    private Client client;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -45,7 +45,7 @@ public class Order {
         joinColumns = @JoinColumn(name = "order_id"),
         inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Long> productIds;
+    private List<Product> products;
 
     public Order(OrderRequestDTO dto) {
         this.description = dto.description();
