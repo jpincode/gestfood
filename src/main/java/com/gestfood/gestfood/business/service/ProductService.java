@@ -21,6 +21,7 @@ import com.gestfood.gestfood.business.exception.EntityNotFoundException;
 import com.gestfood.gestfood.business.exception.InternalServerErrorException;
 import com.gestfood.gestfood.model.entity.Product;
 import com.gestfood.gestfood.model.entity.ProductImage;
+import com.gestfood.gestfood.model.enums.ImageType;
 import com.gestfood.gestfood.model.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
@@ -116,6 +117,7 @@ public class ProductService {
             img.setFileName(webpFile.getName());
             img.setFilePath("/uploads/" + webpFile.getName());
             img.setProduct(product);
+            img.setImageType(ImageType.WEBP);
             product.getImages().add(img);
 
             Files.deleteIfExists(originalPath);
