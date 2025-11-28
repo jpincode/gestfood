@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +34,8 @@ public class ProductService {
     @Autowired
     private ImageSevice imageSevice;
 
-    private static final String DIRECTORY = "/uploads/images/";
+    @Value("${app.upload.dir}")
+    private String DIRECTORY;
 
     public void create(ProductRequestDTO dto, List<MultipartFile> images) {
         Product product = new Product(dto);
@@ -45,7 +47,7 @@ public class ProductService {
                 saveImage(product, images);
             }
         } catch (Exception e) {
-            throw new InternalServerErrorException("Ocorreu um erro interno nno servidor: não foi possível salvar as imagens.");
+            throw new InternalServerErrorException("Ocorreu um erro interno no servidor: não foi possível salvar as imagens.");
         }
 
         productRepository.save(product);
@@ -68,7 +70,7 @@ public class ProductService {
                 saveImage(product, images);
             }
         } catch (Exception e) {
-            throw new InternalServerErrorException("Ocorreu um erro interno nno servidor: não foi possível salvar as imagens.");
+            throw new InternalServerErrorException("Ocorreu um erro interno no servidor: não foi possível salvar as imagens.");
         }
 
         validateEntity(product);
@@ -100,9 +102,6 @@ public class ProductService {
 
     private void saveImage(Product product, List<MultipartFile> images) throws Exception {
         Files.createDirectories(Paths.get(DIRECTORY));
-        if (images == null || images.isEmpty()) {
-            throw new BadRequestException("Imagens não foram anexadas.");
-        }
 
         for (MultipartFile file : images) {
             String originalName = UUID.randomUUID() + "_" + file.getOriginalFilename();

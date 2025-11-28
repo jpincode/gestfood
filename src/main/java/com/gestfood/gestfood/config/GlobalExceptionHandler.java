@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -20,7 +22,7 @@ import com.gestfood.gestfood.business.exception.InternalServerErrorException;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // Error 404 - Not Found
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+    protected ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.NOT_FOUND.value());
         errorResponse.setStatus(HttpStatus.NOT_FOUND.getReasonPhrase());
@@ -32,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Error 409 - Conflict
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         String message = "Violação de integridade: dado duplicado.";
 
@@ -57,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Error 409 - Conflict
     @ExceptionHandler(EntityConflictException.class)
-    public ResponseEntity<ErrorResponse> handleEntityConflictException(EntityConflictException ex) {
+    protected ResponseEntity<ErrorResponse> handleEntityConflictException(EntityConflictException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
         errorResponse.setStatus(HttpStatus.CONFLICT.getReasonPhrase());
@@ -69,31 +71,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Error 400 - Bad Request
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+    protected ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage(ex.getMessage());
         errorResponse.setTimestamp(LocalDateTime.now());
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // Error 400 - Bad Reequest: Images
-    @ExceptionHandler(MissingServletRequestPartException.class)
-    public ResponseEntity<ErrorResponse> hanldeMissingServletRequestPartException(MissingServletRequestPartException ex) {
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(
+            MissingServletRequestPartException ex,
+            HttpHeaders headers,
+            org.springframework.http.HttpStatusCode status,
+            WebRequest request) {
+
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage("Campo obrigatório ausente: " + ex.getRequestPartName());
         errorResponse.setTimestamp(LocalDateTime.now());
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // Error 500 - Internal Server Error
     @ExceptionHandler(InternalServerErrorException.class)
-    public ResponseEntity<ErrorResponse> handleInternalServerErrorException(InternalServerErrorException ex) {
+    protected ResponseEntity<ErrorResponse> handleInternalServerErrorException(InternalServerErrorException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());

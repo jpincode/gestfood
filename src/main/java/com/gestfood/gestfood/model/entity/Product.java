@@ -32,7 +32,7 @@ public class Product {
     private BigDecimal price;
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
     public Product(ProductRequestDTO productRequestDTO) {
