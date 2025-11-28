@@ -16,13 +16,12 @@ import com.gestfood.gestfood.model.repository.DeskRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class DeskService implements InnerDefaultCrud<DeskRequestDTO, DeskReponseDTO, DeskUpdateDTO> {
+public class DeskService {
     @Autowired
     private DeskRepository deskRepository;
     @Autowired
     private ValidationService validationService;
 
-    @Override
     public void create(DeskRequestDTO deskRequestDTO) {
         validateSeats(deskRequestDTO.seats());
         
@@ -30,7 +29,6 @@ public class DeskService implements InnerDefaultCrud<DeskRequestDTO, DeskReponse
         deskRepository.save(desk);
     }
 
-    @Override
     @Transactional
     public void update(Long id, DeskUpdateDTO deskUpdateDTO) {
         validateSeats(deskUpdateDTO.seats());
@@ -41,7 +39,6 @@ public class DeskService implements InnerDefaultCrud<DeskRequestDTO, DeskReponse
         desk.setSeats(deskUpdateDTO.seats());
     }
 
-    @Override
     @Transactional
     public void delete(Long id) {
         validationService.validateId(id);
@@ -52,14 +49,12 @@ public class DeskService implements InnerDefaultCrud<DeskRequestDTO, DeskReponse
         deskRepository.delete(desk);
     }
 
-    @Override
     public List<DeskReponseDTO> read() {
         return deskRepository.findAll()
                 .stream()
                 .map(DeskReponseDTO::new).toList();
     }
 
-    @Override
     public DeskReponseDTO read(Long id) {
         validationService.validateId(id);
 

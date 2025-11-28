@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
 import com.gestfood.gestfood.business.dto.product.ProductResponseDTO;
@@ -25,14 +26,21 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping
-    public ResponseEntity<String> createProduct(@RequestBody ProductRequestDTO productDto) {
-        productService.create(productDto);
+    public ResponseEntity<String> createProduct(
+            @RequestPart("product") ProductRequestDTO productDto,
+            @RequestPart("files") List<MultipartFile> images) {
+
+        productService.create(productDto, images);
         return ResponseEntity.ok().body("Produto cadastrado com sucesso!");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO productDto) {
-        productService.update(id, productDto);
+    public ResponseEntity<String> updateProduct(
+            @PathVariable Long id,
+            @RequestPart("product") ProductUpdateDTO productDto,
+            @RequestPart("files") List<MultipartFile> images) {
+
+        productService.update(id, productDto, images);
         return ResponseEntity.ok().body("Produto atualizado com sucesso!");
     }
 

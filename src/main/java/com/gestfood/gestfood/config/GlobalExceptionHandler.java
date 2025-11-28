@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.gestfood.gestfood.business.exception.EntityConflictException;
@@ -73,6 +74,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage(ex.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // Error 400 - Bad Reequest: Images
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> hanldeMissingServletRequestPartException(MissingServletRequestPartException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        errorResponse.setMessage("Campo obrigatório ausente: " + ex.getRequestPartName());
         errorResponse.setTimestamp(LocalDateTime.now());
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

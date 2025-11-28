@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public abstract class AbstractUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private Long id;
 
     private String password;

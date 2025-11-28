@@ -1,38 +1,58 @@
 package com.gestfood.gestfood.business.service;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
 import com.gestfood.gestfood.business.dto.product.ProductResponseDTO;
 import com.gestfood.gestfood.business.dto.product.ProductUpdateDTO;
 import com.gestfood.gestfood.business.exception.BadRequestException;
 import com.gestfood.gestfood.business.exception.EntityNotFoundException;
+import com.gestfood.gestfood.business.exception.InternalServerErrorException;
 import com.gestfood.gestfood.model.entity.Product;
+import com.gestfood.gestfood.model.entity.ProductImage;
 import com.gestfood.gestfood.model.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
-public class ProductService implements InnerDefaultCrud<ProductRequestDTO, ProductResponseDTO, ProductUpdateDTO> {
+public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
     private ValidationService validationService;
+    @Autowired
+    private ImageSevice imageSevice;
 
-    @Override
-    public void create(ProductRequestDTO dto) {
+    private static final String DIRECTORY = "/uploads/images/";
+
+    public void create(ProductRequestDTO dto, List<MultipartFile> images) {
         Product product = new Product(dto);
+
         validateEntity(product);
+
+        try {
+            if(images != null && !images.isEmpty()) {
+                saveImage(product, images);
+            }
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Ocorreu um erro interno nno servidor: não foi possível salvar as imagens.");
+        }
+
         productRepository.save(product);
     }
 
-    @Override
     @Transactional
-    public void update(Long id, ProductUpdateDTO dto) {
+    public void update(Long id, ProductUpdateDTO dto, List<MultipartFile> images) {
         validationService.validateId(id);
 
         Product product = productRepository.findById(id)
@@ -42,10 +62,18 @@ public class ProductService implements InnerDefaultCrud<ProductRequestDTO, Produ
         product.setDescription(dto.description());
         product.setPrice(dto.price());
 
+        try {
+            if(images != null && !images.isEmpty()) {
+                product.getImages().clear();
+                saveImage(product, images);
+            }
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Ocorreu um erro interno nno servidor: não foi possível salvar as imagens.");
+        }
+
         validateEntity(product);
     }
 
-    @Override
     @Transactional
     public void delete(Long id) {
         validationService.validateId(id);
@@ -56,7 +84,6 @@ public class ProductService implements InnerDefaultCrud<ProductRequestDTO, Produ
         productRepository.delete(product);
     }
 
-    @Override
     public List<ProductResponseDTO> read() {
         return productRepository.findAll()
                 .stream()
@@ -64,12 +91,36 @@ public class ProductService implements InnerDefaultCrud<ProductRequestDTO, Produ
                 .toList();
     }
 
-    @Override
     public ProductResponseDTO read(Long id) {
         validationService.validateId(id);
         return productRepository.findById(id)
                 .map(ProductResponseDTO::new)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado."));
+    }
+
+    private void saveImage(Product product, List<MultipartFile> images) throws Exception {
+        Files.createDirectories(Paths.get(DIRECTORY));
+        if (images == null || images.isEmpty()) {
+            throw new BadRequestException("Imagens não foram anexadas.");
+        }
+
+        for (MultipartFile file : images) {
+            String originalName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path originalPath = Paths.get(DIRECTORY + originalName);
+
+            Files.copy(file.getInputStream(), originalPath);
+
+            File tempOriginalFile = originalPath.toFile();
+            File webpFile = imageSevice.convertToWebp(tempOriginalFile);
+
+            ProductImage img = new ProductImage();
+            img.setFileName(webpFile.getName());
+            img.setFilePath("/uploads/" + webpFile.getName());
+            img.setProduct(product);
+            product.getImages().add(img);
+
+            Files.deleteIfExists(originalPath);
+        }
     }
 
     private void validateEntity(Product entity) {

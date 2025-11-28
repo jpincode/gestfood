@@ -16,20 +16,18 @@ import com.gestfood.gestfood.model.repository.EmployeeRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class EmployeeService implements InnerDefaultCrud<EmployeeRequestDTO, EmployeeResponseDTO, EmployeeUpdateDTO> {
+public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
     private ValidationService validationService;
 
-    @Override
     public void create(EmployeeRequestDTO dto) {
         Employee employee = new Employee(dto);
         validateEntity(employee);
         employeeRepository.save(employee);
     }
 
-    @Override
     @Transactional
     public void update(Long id, EmployeeUpdateDTO dto) {
         validationService.validateId(id);
@@ -45,7 +43,6 @@ public class EmployeeService implements InnerDefaultCrud<EmployeeRequestDTO, Emp
         validateEntity(employee);
     }
 
-    @Override
     @Transactional
     public void delete(Long id) {
         validationService.validateId(id);
@@ -56,7 +53,6 @@ public class EmployeeService implements InnerDefaultCrud<EmployeeRequestDTO, Emp
         employeeRepository.delete(employee);
     }
 
-    @Override
     public List<EmployeeResponseDTO> read() {
         return employeeRepository.findAll()
                 .stream()
@@ -64,7 +60,6 @@ public class EmployeeService implements InnerDefaultCrud<EmployeeRequestDTO, Emp
                 .toList();
     }
 
-    @Override
     public EmployeeResponseDTO read(Long id) {
         validationService.validateId(id);
 

@@ -20,7 +20,7 @@ import com.gestfood.gestfood.model.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResponseDTO, OrderUpdateDTO> {
+public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -28,7 +28,6 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
     @Autowired
     private ProductRepository productRepository;
 
-    @Override
     public void create(OrderRequestDTO dto) {
         Order order = new Order(dto);
 
@@ -48,7 +47,6 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
         orderRepository.save(order);
     }
 
-    @Override
     @Transactional
     public void update(Long id, OrderUpdateDTO dto) {
         Order order = orderRepository.findById(id)
@@ -70,7 +68,6 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
         validateEntity(order);
     }
 
-    @Override
     @Transactional
     public void delete(Long id) {
         validationService.validateId(id);
@@ -81,7 +78,6 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
         orderRepository.delete(order);
     }
 
-    @Override
     public List<OrderResponseDTO> read() {
         return orderRepository.findAll()
                 .stream()
@@ -89,7 +85,6 @@ public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResp
                 .toList();
     }
 
-    @Override
     public OrderResponseDTO read(Long id) {
         validationService.validateId(id);
         return orderRepository.findById(id)
