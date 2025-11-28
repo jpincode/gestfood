@@ -3,6 +3,7 @@ package com.gestfood.gestfood.config;
 import java.time.LocalDateTime;
 
 import org.apache.coyote.BadRequestException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +30,31 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // Error 409 - Conflict
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        String message = "Violação de integridade: dado duplicado.";
+
+        Throwable cause = ex.getMostSpecificCause();
+        if (cause != null && cause.getMessage() != null) {
+            String msg = cause.getMessage().toLowerCase();
+
+            if (msg.contains("cpf")) {
+                message = "Já existe um funcionário com este CPF.";
+            } else if (msg.contains("email")) {
+                message = "Já existe um funcionário com este email.";
+            }
+        }
+
+        errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
+        errorResponse.setStatus(HttpStatus.CONFLICT.getReasonPhrase());
+        errorResponse.setMessage(message);
+        errorResponse.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // Error 409 - Conflict
     @ExceptionHandler(EntityConflictException.class)
     public ResponseEntity<ErrorResponse> handleEntityConflictException(EntityConflictException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -48,6 +74,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage(ex.getMessage());
         errorResponse.setTimestamp(LocalDateTime.now());
+        
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 

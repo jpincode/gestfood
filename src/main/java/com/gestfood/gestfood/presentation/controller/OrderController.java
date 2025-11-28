@@ -1,5 +1,7 @@
 package com.gestfood.gestfood.presentation.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestfood.gestfood.business.dto.OrderDTO;
+import com.gestfood.gestfood.business.dto.order.OrderRequestDTO;
+import com.gestfood.gestfood.business.dto.order.OrderResponseDTO;
+import com.gestfood.gestfood.business.dto.order.OrderUpdateDTO;
 import com.gestfood.gestfood.business.service.OrderService;
 
 @RestController
@@ -21,50 +25,30 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO) {
-        try {
-            orderService.create(orderDTO);
-            return ResponseEntity.ok().body("Order created successfully.");
-        } catch (Exception e) {
-            throw e;
-        }
+    public ResponseEntity<String> createOrder(@RequestBody OrderRequestDTO orderDTO) {
+        orderService.create(orderDTO);
+        return ResponseEntity.ok().body("Pedido cadastrado com sucesso!");
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateOrder(@RequestBody OrderDTO orderDTO) {
-        try {
-            orderService.update(orderDTO);
-            return ResponseEntity.ok().body("Order updated successfully.");
-        } catch (Exception e) {
-            throw e;
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateOrder(@PathVariable Long id, @RequestBody OrderUpdateDTO orderDTO) {
+        orderService.update(id, orderDTO);
+        return ResponseEntity.ok().body("Pedido atualizado com sucesso!");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
-        try {
-            orderService.delete(id);
-            return ResponseEntity.ok().body("Order deleted successfully.");
-        } catch (Exception e) {
-            throw e;
-        }
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        orderService.delete(id);
+        return ResponseEntity.ok().body("Pedido deletado com sucesso!");
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllOrders() {
-        try {
-            return ResponseEntity.ok().body(orderService.read());
-        } catch (Exception e) {
-            throw e;
-        }
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
+        return ResponseEntity.ok().body(orderService.read());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok().body(orderService.read(id));
-        } catch (Exception e) {
-            throw e;
-        }
+    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(orderService.read(id));
     }
 }

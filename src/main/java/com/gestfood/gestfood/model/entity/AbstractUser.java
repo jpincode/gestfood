@@ -23,9 +23,9 @@ public abstract class AbstractUser {
     private String password;
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
-    private Long cpf;
+    @Column(unique = true, nullable = false)
+    private String cpf;
 }

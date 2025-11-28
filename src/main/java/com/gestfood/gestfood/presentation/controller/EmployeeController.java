@@ -3,7 +3,6 @@ package com.gestfood.gestfood.presentation.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestfood.gestfood.business.dto.EmployeeDTO;
+import com.gestfood.gestfood.business.dto.employee.EmployeeRequestDTO;
+import com.gestfood.gestfood.business.dto.employee.EmployeeResponseDTO;
+import com.gestfood.gestfood.business.dto.employee.EmployeeUpdateDTO;
 import com.gestfood.gestfood.business.service.EmployeeService;
 
 @RestController
@@ -24,52 +25,30 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<?> createEmployee(@RequestBody EmployeeDTO employeeDto) {
-        try {
-            employeeService.create(employeeDto);
-            return ResponseEntity.ok().body("Employee created successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequestDTO employeeDto) {
+        employeeService.create(employeeDto);
+        return ResponseEntity.ok().body("Funcionário cadastrado com sucesso!");
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateEmployee(@RequestBody EmployeeDTO employeeDto) {
-        try {
-            employeeService.update(employeeDto);
-            return ResponseEntity.ok().body("Employee updated successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateEmployee(@PathVariable Long id, @RequestBody EmployeeUpdateDTO employeeDto) {
+        employeeService.update(id, employeeDto);
+        return ResponseEntity.ok().body("Funcionário atualizado com sucesso!");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
-        try {
-            employeeService.delete(id);
-            return ResponseEntity.ok().body("Employee deleted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
+        employeeService.delete(id);
+        return ResponseEntity.ok().body("Funcionário deletado com sucesso!");
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllEmployees() {
-        try {
-            List<EmployeeDTO> employees = employeeService.read();
-            return ResponseEntity.ok().body(employees);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
-        }
+    public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
+        return ResponseEntity.ok().body(employeeService.read());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
-        try {
-            EmployeeDTO employeeDTO = employeeService.read(id);
-            return ResponseEntity.ok(employeeDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(employeeService.read(id));
     }
 }

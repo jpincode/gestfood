@@ -1,9 +1,11 @@
 package com.gestfood.gestfood.business.dto.product;
 
+import java.math.BigDecimal;
+
 import com.gestfood.gestfood.model.entity.Product;
 
-public record ProductResponseDTO(String name, Double price, String description) {
+public record ProductResponseDTO(Long id, String name, BigDecimal price, String description) {
     public ProductResponseDTO(Product product) {
-        this(product.getName(), product.getPrice(), product.getDescription());
+        this(product.getId(), product.getName(), product.getPrice(), product.getDescription());
     }
 }

@@ -1,84 +1,110 @@
 package com.gestfood.gestfood.business.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestfood.gestfood.business.dto.OrderDTO;
-import com.gestfood.gestfood.business.exception.EntityConflictException;
+import com.gestfood.gestfood.business.dto.order.OrderRequestDTO;
+import com.gestfood.gestfood.business.dto.order.OrderResponseDTO;
+import com.gestfood.gestfood.business.dto.order.OrderUpdateDTO;
+import com.gestfood.gestfood.business.exception.BadRequestException;
 import com.gestfood.gestfood.business.exception.EntityNotFoundException;
 import com.gestfood.gestfood.model.entity.Order;
+import com.gestfood.gestfood.model.entity.Product;
 import com.gestfood.gestfood.model.repository.OrderRepository;
+import com.gestfood.gestfood.model.repository.ProductRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
-public class OrderService implements InnerDefaultCrud<OrderDTO> {
+public class OrderService implements InnerDefaultCrud<OrderRequestDTO, OrderResponseDTO, OrderUpdateDTO> {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private ConverterService converterService;
+    private ValidationService validationService;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
-    public void create(OrderDTO dto) {
-        Order order = converterService.dtoToOrder(dto);
-        Optional<Order> orderExists = orderRepository.findById(order.getId());
-        
-        if (orderExists.isPresent()) {
-            throw new EntityConflictException("Já existe um pedido com o ID: " + order.getId());
-        }
-        order.calculateTotalAmount();
+    public void create(OrderRequestDTO dto) {
+        Order order = new Order(dto);
+
+        BigDecimal total = dto.productIds().stream()
+                .map(id -> productRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Produto com ID: " + id + " não encontrado.")))
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        order.setTotalAmount(total);
+        order.setClientId(dto.clientId());
+        order.setProductIds(new ArrayList<>(dto.productIds()));
+
+        validateEntity(order);
+
         orderRepository.save(order);
     }
 
     @Override
-    public void update(OrderDTO dto) {
-        Optional<Order> optionalOrder = orderRepository.findById(dto.getId());
-        if (!optionalOrder.isPresent()) {
-            throw new EntityNotFoundException("O pedido não foi encontrado.");
-        }
-        
-        Order orderToUpdate = optionalOrder.get();
-        Order updatedOrder = converterService.dtoToOrder(dto);
-        
-        updatedOrder.setId(orderToUpdate.getId());
-        orderRepository.save(updatedOrder);
+    @Transactional
+    public void update(Long id, OrderUpdateDTO dto) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
+
+        BigDecimal recalculatedTotal = dto.productIds().stream()
+                .map(idFind -> productRepository.findById(idFind)
+                        .orElseThrow(
+                                () -> new EntityNotFoundException("Produto com ID: " + idFind + " não encontrado.")))
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        order.setDescription(dto.description());
+        order.setStatus(dto.status());
+        order.setTotalAmount(recalculatedTotal);
+        order.setClientId(dto.clientId());
+        order.setProductIds(new ArrayList<>(dto.productIds()));
+
+        validateEntity(order);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        Optional<Order> order = orderRepository.findById(id);
-        if (order.isPresent()) {
-            orderRepository.deleteById(id);
-        } else {
-            throw new EntityNotFoundException("Não foi possivel encontrar o pedido com o ID: " + id);
-        }
+        validationService.validateId(id);
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
+
+        orderRepository.delete(order);
     }
 
     @Override
-    public List<OrderDTO> read() {
-        List<Order> orders = orderRepository.findAll();
-        List<OrderDTO> orderDTOs = new ArrayList<>();
-
-        if (orders.isEmpty()) {
-            throw new EntityNotFoundException("Não existem pedidos cadastrados.");
-        }
-        
-        for (Order order : orders) {
-            OrderDTO dto = converterService.orderToDto(order);
-            orderDTOs.add(dto);
-        } 
-        return orderDTOs;
+    public List<OrderResponseDTO> read() {
+        return orderRepository.findAll()
+                .stream()
+                .map(OrderResponseDTO::new)
+                .toList();
     }
 
     @Override
-    public OrderDTO read(Long id) {
-        Optional<Order> optionalOrder = orderRepository.findById(id);
-        if (optionalOrder.isPresent()) {
-            return converterService.orderToDto(optionalOrder.get());
-        } else {
-            throw new EntityNotFoundException("O pedido com ID: " + id + " não foi encontrado.");
+    public OrderResponseDTO read(Long id) {
+        validationService.validateId(id);
+        return orderRepository.findById(id)
+                .map(OrderResponseDTO::new)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
+    }
+
+    private void validateEntity(Order entity) {
+        if(entity.getDescription() == null || entity.getDescription().isBlank()) {
+            throw new BadRequestException("A descrição do pedido não pode ser nula/vazia.");
+        }
+        if(entity.getStatus() == null || entity.getStatus().isBlank()) {
+            throw new BadRequestException("O status do pedido não pode ser nulo/vazio.");
+        }
+        if(entity.getClientId() == null || entity.getClientId() <= 0) {
+            throw new BadRequestException("O ID do cliente não pode ser nulo/menor ou igual a zero.");
         }
     }
 }

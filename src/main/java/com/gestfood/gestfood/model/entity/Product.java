@@ -1,5 +1,7 @@
 package com.gestfood.gestfood.model.entity;
 
+import java.math.BigDecimal;
+
 import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
 
 import jakarta.persistence.Entity;
@@ -24,7 +26,7 @@ public class Product {
     private Long id;
     
     private String name;
-    private Double price;
+    private BigDecimal price;
     private String description;
 
     public Product(ProductRequestDTO productRequestDTO) {

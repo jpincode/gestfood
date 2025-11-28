@@ -1,6 +1,9 @@
 package com.gestfood.gestfood.model.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import com.gestfood.gestfood.business.dto.order.OrderRequestDTO;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,12 +32,12 @@ public class Order {
     private Long id;
 
     private String description;
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     private String status;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
-    private Client client;
+    private Long clientId;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -42,14 +45,10 @@ public class Order {
         joinColumns = @JoinColumn(name = "order_id"),
         inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Product> products;
+    private List<Long> productIds;
 
-    public void calculateTotalAmount() {
-        if (this.products == null || this.products.isEmpty()) {
-            this.totalAmount = 0.0;
-            return;
-        }
-
-        this.totalAmount = this.products.stream().mapToDouble(Product::getPrice).sum();
+    public Order(OrderRequestDTO dto) {
+        this.description = dto.description();
+        this.status = dto.status();
     }
 }

@@ -1,8 +1,7 @@
 package com.gestfood.gestfood.business.service;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,9 +9,8 @@ import org.springframework.stereotype.Service;
 import com.gestfood.gestfood.business.dto.product.ProductRequestDTO;
 import com.gestfood.gestfood.business.dto.product.ProductResponseDTO;
 import com.gestfood.gestfood.business.dto.product.ProductUpdateDTO;
-import com.gestfood.gestfood.business.exception.EntityConflictException;
+import com.gestfood.gestfood.business.exception.BadRequestException;
 import com.gestfood.gestfood.business.exception.EntityNotFoundException;
-import com.gestfood.gestfood.business.exception.InternalServerErrorException;
 import com.gestfood.gestfood.model.entity.Product;
 import com.gestfood.gestfood.model.repository.ProductRepository;
 
@@ -23,62 +21,66 @@ public class ProductService implements InnerDefaultCrud<ProductRequestDTO, Produ
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private ConverterService converterService;
+    private ValidationService validationService;
 
     @Override
-    public void create(ProductDTO productDTO) {
-        Product product = converterService.dtoToProduct(productDTO);
-        Optional<Product> productExists = productRepository.findById(product.getId());
-        if (productExists.isPresent()) {
-            throw new EntityConflictException("Já existe um produto com o ID: " + product.getId());
-        }
+    public void create(ProductRequestDTO dto) {
+        Product product = new Product(dto);
+        validateEntity(product);
         productRepository.save(product);
     }
 
     @Override
     @Transactional
-    public void update(ProductDTO productDTO) {
-        Product product = converterService.dtoToProduct(productDTO);
-        Optional<Product> productExists = productRepository.findById(product.getId());
-        if (productExists.isEmpty()) {
-            throw new EntityNotFoundException("O produto não foi encontrado.");
-        }
-        productRepository.save(product);
+    public void update(Long id, ProductUpdateDTO dto) {
+        validationService.validateId(id);
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado."));
+
+        product.setName(dto.name());
+        product.setDescription(dto.description());
+        product.setPrice(dto.price());
+
+        validateEntity(product);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        if (id == null || id <= 0) {
-            throw new InternalServerErrorException("O ID do produto não pode ser nulo nem menor ou igual a zero.");
-        }
-        productRepository.deleteById(id);
+        validationService.validateId(id);
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado."));
+
+        productRepository.delete(product);
     }
 
     @Override
-    public List<ProductDTO> read() {
-        List<Product> products = productRepository.findAll();
-        List<ProductDTO> productDTOs = new ArrayList<>();
-
-        if(products.isEmpty()) {
-            throw new EntityNotFoundException("Não existem produtos cadastrados.");
-        }
-        
-        for (Product product : products) {
-            productDTOs.add(converterService.productToDto(product));
-        }
-        return productDTOs;
+    public List<ProductResponseDTO> read() {
+        return productRepository.findAll()
+                .stream()
+                .map(ProductResponseDTO::new)
+                .toList();
     }
 
     @Override
-    public ProductDTO read(Long id) {
-        if (id == null) {
-            throw new InternalServerErrorException("O ID do produto não pode ser nulo.");
+    public ProductResponseDTO read(Long id) {
+        validationService.validateId(id);
+        return productRepository.findById(id)
+                .map(ProductResponseDTO::new)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado."));
+    }
+
+    private void validateEntity(Product entity) {
+        if (entity.getDescription() == null || entity.getDescription().isBlank()) {
+            throw new BadRequestException("A descrição do produto não pode ser nula/vazia.");
         }
-        Optional<Product> product = productRepository.findById(id);
-        if (product.isEmpty()) {
-            throw new EntityNotFoundException("O produto com ID: " + id + " não foi encontrado.");
+        if (entity.getName() == null || entity.getName().isBlank()) {
+            throw new BadRequestException("O nome do produto não pode ser nulo/vazio.");
         }
-        return converterService.productToDto(product.get());
+        if (entity.getPrice() == null || entity.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("O preço do produto não pode ser nulo/menor ou igual a zero.");
+        }
     }
 }

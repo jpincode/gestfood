@@ -32,11 +32,11 @@ public class DeskService implements InnerDefaultCrud<DeskRequestDTO, DeskReponse
 
     @Override
     @Transactional
-    public void update(DeskUpdateDTO deskUpdateDTO) {
+    public void update(Long id, DeskUpdateDTO deskUpdateDTO) {
         validateSeats(deskUpdateDTO.seats());
-        validationService.validateId(deskUpdateDTO.id());
+        validationService.validateId(id);
 
-        Desk desk = deskRepository.findById(deskUpdateDTO.id())
+        Desk desk = deskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("A mesa não foi encontrada."));
         desk.setSeats(deskUpdateDTO.seats());
     }

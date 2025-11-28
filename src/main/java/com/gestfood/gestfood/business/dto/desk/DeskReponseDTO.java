@@ -2,8 +2,8 @@ package com.gestfood.gestfood.business.dto.desk;
 
 import com.gestfood.gestfood.model.entity.Desk;
 
-public record DeskReponseDTO(int seats) {
+public record DeskReponseDTO(Long id, int seats) {
     public DeskReponseDTO(Desk desk) {
-        this(desk.getSeats());
+        this(desk.getId(), desk.getSeats());
     }
 }
